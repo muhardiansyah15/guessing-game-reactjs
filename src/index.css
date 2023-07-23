@@ -74,10 +74,6 @@ section {
     min-height: 363px;
 }
 
-/* section {
-    padding: 25px 0 15px 0;
-}  */
-
 
 .quote {
     background:#549DA0;
@@ -170,7 +166,9 @@ footer li a:hover {
 
 .game-result {
     text-align: center;
-    color:darkblue;
+    color:#284b63;
+    font-size:50px;
+    font-weight: bold;
 }
 
 @media screen and (max-width: 480px) {
@@ -179,12 +177,19 @@ footer li a:hover {
         font-size: 18px;
     }
     h1 {
-        font-size: 32px;
+        font-size: 23px;
         margin: 0 0 8px 0;
     }
     h2 {
-        font-size: 18px;
+        font-size: 15px;
     }
+
+    section {
+      text-align: left;
+      padding: 40px 0;
+      min-height: 327px;
+  }
+  
     
     .feature {
         width: 100%;

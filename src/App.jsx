@@ -1,112 +1,20 @@
 import { useState } from 'react'
+import buildTable from './BuildTable.jsx'
+import renderFormInputs from './InputForm.jsx'
+import randomList from './Helper.jsx'
 
-function randomList(list) {
-  for (let i = list.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [list[i], list[j]] = [list[j], list[i]];
-  }
-  return list;
-}
-
+  
 function randomAlphabet() {
   let alphabet = Array.from({ length: 26 }, (_, index) => String.fromCharCode(65 + index));
   return randomList(alphabet);
 }
 
-function buildTable(NumRow, NumColumn, data){
-  let tableHeader = [];
-  let tableBody = [];
-
-  if (NumRow >0 && NumColumn >0) {
-    for (let i = 0; i < NumColumn; i++) {
-      tableHeader.push(<th key={i + 1}>{i + 1}</th>);
-    }
-    tableHeader = <tr>{tableHeader}</tr>;
-
-    
-    let k = 0;
-    for (let i = 0; i < NumRow; i++) {
-      let tableRow = [];
-      for (let j = 0; j < NumColumn; j++) {
-        if (k < data.length) {
-          tableRow.push(<td key={k}>{data[k]}</td>);
-        } else {
-          tableRow.push(<td key={k}></td>);
-        }
-        k += 1;
-      }
-      tableBody.push(<tr key={i}>{tableRow}</tr>);
-    }
-
-    return (
-      <table className="alfabet-table">
-        <thead>{tableHeader}</thead>
-        <tbody>{tableBody}</tbody>
-      </table>
-    );
-  } else {
-    return (
-      <div></div>
-    )
-  }  
-}
-
-
-const randomizedAlphabet = randomAlphabet();
-let formInputValue = { 1 : {}, 2 : {} };
-let result = '';
-
-
-function handleInputNameLength(event, formInputValue, setNumInputs){
-  const inputCount = parseInt(event.target.value);
-  if (inputCount >= 3 && inputCount <= 10) {
-    setNumInputs(inputCount);
-    for (let i=0; i<inputCount; i++){
-      formInputValue[1][i] = 0;
-      formInputValue[2][i] = 0
-    }
-  } else if (inputCount>10) {
-    setNumInputs(0);
-    alert("Maksimum 10 karakter");
-  } else if (inputCount<3){
-    setNumInputs(0);
-    alert("Minimal 3 karakter");
-  }
-};
-
-
-function handleFirstFormInputChange(i, event, table, numInputs){
-  const inputValue = parseInt(event.target.value);
-  if (inputValue<1 || inputValue>numInputs){
-    if (table == 1) {
-      alert("Kolom "+inputValue+" tidak ada!");
-    }
-  } else {
-    if (table == 1) {
-      formInputValue[1][i] = inputValue;
-    } else {
-      formInputValue[2][i] = inputValue;
-    }
-  }
-}
-
-function renderFormInputs(table, numInputs){
-  const inputs = [];
-  for (let i = 0; i < numInputs; i++) {
-    inputs.push(
-      <tr key={i}>
-        <td>
-          Huruf ke-{i + 1} berada dikolom?
-        </td>
-        <td>
-          <input type="text" placeholder={`No. Kolom`} 
-            onChange={(event) => handleFirstFormInputChange(i, event, table, numInputs)}/>
-        </td>
-      </tr>
-    );
-  }
-  return inputs;
-};
+let randomizedAlphabet = randomAlphabet();
+let NumRow = 0;
+let NumColumn = 0;
+let formInputValueFirst = {};
+let formInputValueSecond = {};
+let result = "";
 
 function App() {
   const [numInputs, setNumInputs] = useState(0);
@@ -117,178 +25,272 @@ function App() {
   const [showSection4, setShowSection4] = useState(false);
   const [showSection5, setShowSection5] = useState(false);
 
-  let NumRow = 0;
-  let NumColumn = 0;
-
-  if (numInputs>0){
-    NumColumn =  numInputs;
-    NumRow = (26 % numInputs > 0)? Math.floor(26/numInputs) + 1 : Math.floor(26/numInputs);
-  };
- 
-  const firstTable = () => buildTable(NumRow, NumColumn, randomizedAlphabet);
-
   
-  const startHandleClick = () => {
-    setShowSection0(false);
-    setShowSection1(true); 
-  };
 
-  const firstHandleClick = () => {
-    setShowSection1(false);
-    setShowSection2(true);
-  }
-
-  const secondHandleClick = () => {
-    if (numInputs>10) {
-      alert("Maksimum 10 karakter");
-      return
-    } else if (numInputs<3){
-      alert("Beritahu Saya berapa huruf namanya!");
-      return
-    }
-    setShowSection2(false);
-    setShowSection3(true);
-  };
-
-  const thirdHandleClick = () => {
-    for (let key in formInputValue[1]){
-      if (formInputValue[1][key]<1 ||  formInputValue[1][key] > numInputs ){
-        alert("Inputan Salah!\nKolom "+ formInputValue[1][key] + " tidak ada.");
-        return
-      } else if (!formInputValue[1][key]){
-        alert("Inputan Salah!\nBeritahu saya No. Kolom untuk hruf ke-"+ formInputValue[1][key] + ".");
-        return
-      }
-    }
-    setShowSection3(false);
-    setShowSection4(true); 
-  };
-
-  let SecondAlphabet = [];
-  for (let i=0; i < numInputs; i++) {
-    let j = formInputValue[1][i]-1;
-    for (let k=0; k < NumRow; k++){
-        if (randomizedAlphabet[j]) {
-          SecondAlphabet.push(randomizedAlphabet[j]);
-        } else {
-        SecondAlphabet.push("");
-        };
-        j += numInputs;
+ 
+  let nextSection = <div></div>;
+  if (showSection0) {
+    const handleSection0 = () => {
+      setShowSection0(false);
+      setShowSection1(true);
     };
-  };
+    nextSection = <div className="container">
+                      <p>Ayo kita bermain permainan menebak nama! Kamu pikirkan nama seseorang, dan saya akan mencoba menebaknya.<br/>
+                        Bagaimana menurutmu?</p>
+                      <p><button className="btn-start" onClick={handleSection0}>Let's Play</button></p>
+                  </div>
+  } else if (showSection1) {
+    const handleSection1 = () => {
+      setShowSection1(false);
+      setShowSection2(true);
+    };
+    nextSection= <div className="container">
+                    <p><b>Instruksi 1:</b></p>
+                    <p>Ingat satu nama panggilan seseorang dipikiranmu. Kemudian, biarkan Saya akan menebaknya.</p>
+                    <p>Jika sudah, klik Next untuk instruksi selanjutnya.</p>
+                    <p>
+                    <button className="btn-next" onClick={handleSection1}>Next</button>
+                    </p>
+                </div>
 
-  let NumColumn2 = NumRow;
-  let NumRow2 = NumColumn;
 
-  const secondTable = () => buildTable(NumRow2, NumColumn2, SecondAlphabet);
 
-  const fourthHandleClick = () => {
-    for (let key in formInputValue[2]){
-      if (formInputValue[2][key]<1 ||  formInputValue[2][key] > NumColumn2){
-        alert("Inputan Salah!\nKolom "+ formInputValue[2][key] + " tidak ada.");
+
+  } else if (showSection2) {
+
+    function handleInputNameLength(event, setNumInputs){
+      const inputValue = parseInt(event.target.value);
+      if (inputValue>10) {
+        alert("Maksimal 10 karakter");
         return
-      } else if (!formInputValue[2][key]){
-        alert("Inputan Salah!\nBeritahu saya No. Kolom untuk hruf ke-"+ formInputValue[1][key] + ".");
+      } else if (inputValue<3 && inputValue>0){
+        alert("Minimal 3 karakter");
         return
+      } else if (inputValue<0) {
+        alert("Beritahu Saya berapa jumlah huruf namanya!");
+      } else {
+        setNumInputs(inputValue);
       }
     }
-    setShowSection4(false);
-    setShowSection5(true); 
-  }
 
-  const lastHandleClick = () => {
-    setShowSection5(false);
-    setShowSection1(true); 
-  }  
+    const secondHandleClick = () => {
+      if (numInputs>10) {
+        alert("Maksimal 10 karakter");
+        return
+      } else if (numInputs<3 && numInputs>0){
+        alert("Minimal 3 karakter");
+        return
+      } else if (numInputs<0) {
+        alert("Beritahu Saya berapa jumlah huruf namanya!");
+      } else {
+        for (let i=0; i<numInputs; i++) {
+          formInputValueFirst[i] = 0;
+          formInputValueSecond[i] = 0;
+        }
+      }
+
+      setShowSection2(false);
+      setShowSection3(true);
+    };
+    nextSection = <div className="container">
+                    <p><b>Instruksi 2:</b></p>
+                    <p>Beritahu saya berapa huruf namanya.</p>
+                    <p>
+                      <label>Berapa huruf namanya? </label>
+                      <input type="number" min="1" max="10" 
+                            onChange={(event) => handleInputNameLength(event, setNumInputs)} />
+                    </p>
+                    <p>
+                      Klik Next untuk instruksi selanjutnya.<br/>
+                      
+                    </p>
+                    <p><button className="btn-next" onClick={secondHandleClick}>Next</button></p>
+                  </div>
 
 
-  let result= '';
-  for (let i=0; i<numInputs; i++){
-    result += SecondAlphabet[(i*NumColumn2)+formInputValue[2][i]-1];
+
+
+  } else if (showSection3) {
+    if (numInputs>0){
+      NumColumn =  numInputs;
+      NumRow = (26 % numInputs > 0)? Math.floor(26/numInputs) + 1 : Math.floor(26/numInputs);
+    };
+    const firstTable = () => buildTable(NumRow, NumColumn, randomizedAlphabet);
+
+    const handleFirstFormInputChange = (i, event) => {
+      const inputValue = parseInt(event.target.value);
+      if (inputValue<1 || inputValue>numInputs){
+          alert("Kolom "+inputValue+" tidak ada!");
+      } else {
+          formInputValueFirst[i] = inputValue;
+
+      }
+    };
+    
+    const renderFirstFormInputs = () => {
+        const inputs = [];
+        for (let i = 0; i < numInputs; i++) {
+          inputs.push(
+            <tr key={i}>
+              <td>
+                Huruf ke-{i + 1} berada dikolom?
+              </td>
+              <td>
+                <input type="text" placeholder={`No. Kolom`} 
+                  onChange={(event) => handleFirstFormInputChange(i, event)}/>
+              </td>
+            </tr>
+          );
+        }
+        return inputs;
+    };
+
+    const thirdHandleClick = () => {
+      for (let key in formInputValueFirst){
+        if (formInputValueFirst[key]<1 ||  formInputValueFirst[key] > numInputs ){
+          alert("Inputan Salah!\nKolom "+ formInputValueFirst[key] + " tidak ada.");
+          return
+        } else if (!formInputValueFirst[key]){
+          alert("Inputan Salah!\nBeritahu saya No. Kolom untuk hruf ke-"+ formInputValueFirst[key] + ".");
+          return
+        }
+      }
+      setShowSection3(false);
+      setShowSection4(true);
+    };
+    nextSection = <div className="container">
+                    <p><b>Instruksi 3:</b></p>
+                    <p>Dari tabel berikut, beritahu saya dikolom mana saja huruf-hurufnya.</p>
+                    <p>Note: Pastikan nomor kolom yang di input benar. Jika tidak saya tidak dapat menembaknya.</p>
+                    <div className="feature">
+                      <table>
+                        <tbody>{renderFirstFormInputs()}</tbody>
+                      </table>
+                    </div>
+                    <div className="feature">{firstTable()}</div>
+                    <p>
+                      Klik Next untuk instruksi selanjutnya.
+                    </p>
+                    <p> <button className="btn-next" onClick={thirdHandleClick}>Next</button></p>
+                  </div>
+
+
+
+
+  } else if (showSection4) {
+    let NumColumn2 = NumRow;
+    let NumRow2 = NumColumn;
+
+    const handleSecondFormInputChange = (i, event) => {
+      const inputValue = parseInt(event.target.value);
+      if (inputValue<1 || inputValue>NumColumn2){
+          alert("Kolom "+inputValue+" tidak ada!");
+      } else {
+        formInputValueSecond[i] = inputValue;
+      }
+    };
+    
+    const renderSecondFormInputs = () => {
+        const inputs = [];
+        for (let i = 0; i < numInputs; i++) {
+          inputs.push(
+            <tr key={i}>
+              <td>
+                Huruf ke-{i + 1} berada dikolom?
+              </td>
+              <td>
+                <input type="text" placeholder={`No. Kolom`} 
+                  onChange={(event) => handleSecondFormInputChange(i, event)}/>
+              </td>
+            </tr>
+          );
+        }
+        return inputs;
+    };
+
+    let SecondAlphabet = [];
+    for (let i=0; i < numInputs; i++) {
+      let j = formInputValueFirst[i]-1;
+      for (let k=0; k < NumRow; k++){
+          if (randomizedAlphabet[j]) {
+            SecondAlphabet.push(randomizedAlphabet[j]);
+          } else {
+            SecondAlphabet.push("");
+          };
+          j += numInputs;
+      };
+    };
+
+    
+    for (let i=0; i<SecondAlphabet.length; i++){
+      if (!SecondAlphabet[i]){
+        for (let j=0; j<randomizedAlphabet.length; j++){
+          if (!SecondAlphabet.includes(randomizedAlphabet[j])){
+            SecondAlphabet[i] = randomizedAlphabet[j];
+            continue;
+          }
+        }
+      }
+    }
+
+    const secondTable = () => buildTable(NumRow2, NumColumn2, SecondAlphabet);
+
+    const fourthHandleClick = () => {
+      for (let key in formInputValueSecond){
+        if (formInputValueSecond[key]<1 ||  formInputValueSecond[key] > NumColumn2){
+          alert("Inputan Salah!\nKolom "+ formInputValueSecond[key] + " tidak ada.");
+          return
+        } else if (!formInputValueSecond[key]){
+          alert("Inputan Salah!\nBeritahu saya No. Kolom untuk hruf ke-"+ formInputValueSecond[key] + ".");
+          return
+        }
+      }
+      setShowSection4(false);
+      setShowSection5(true); 
+
+      for (let i=0; i<numInputs; i++){
+        result += SecondAlphabet[(i*NumColumn2)+formInputValueSecond[i]-1];
+      };
+    };
+    
+    nextSection = <div className="container">
+                    <p><b>Instruksi 4:</b></p>
+                    <p>Lakukan seperti di instruksi 3, beritahu saya lagi dikolom mana saja huruf-hurufnya di dalam tabel berikut.</p>
+                    <div className="feature">
+                      <table>
+                        <tbody>{renderSecondFormInputs()}</tbody>
+                      </table>
+                    </div>
+                    <div className="feature">{secondTable()}</div>
+                    <p>
+                      Klik Next, untuk melihat hasil tebakan saya.<br/>
+                    </p>
+                    <p><button className="btn-next" onClick={fourthHandleClick}>Next</button></p>
+                  </div>
+  } else if (showSection5) {
+    
+    const lastHandleClick = () => {
+      setShowSection0(true);
+      setShowSection1(false);
+      setShowSection2(false);
+      setShowSection3(false);
+      setShowSection4(false);
+      setShowSection5(false);
+      formInputValueFirst = {};
+      formInputValueSecond = {};
+      result = '';
+      randomizedAlphabet = randomAlphabet();
+    };
+    nextSection = <div className="container">
+                    <p>Yeah, I got it right! The name you had in mind is</p>
+                    <p className="game-result">{result}</p>
+                    <p><button className="btn-next" onClick={lastHandleClick}>Main Lagi?</button></p>
+                  </div>
   }
 
   return (
     <div>
-      {showSection0 && (
-      <div className="container">
-         <p>Ayo kita bermain permainan menebak nama! Kamu pikirkan nama seseorang, dan saya akan mencoba menebaknya.<br/>
-            Bagaimana menurutmu?</p>
-          <p><button className="btn-start" onClick={startHandleClick}>Let's Play</button></p>
-      </div>
-      )}
-
-      {showSection1 && (
-      <div className="container">
-         <p>Instruksi 1:</p>
-         <p>Ingat satu nama panggilan seseorang dipikiranmu. Kemudian, biarkan Saya akan menebaknya.</p>
-         <p>Jika sudah, klik Next untuk instruksi selanjutnya.</p>
-         <p>
-         <button className="btn-next" onClick={firstHandleClick}>Next</button>
-         </p>
-      </div>
-      )}
-
-      {showSection2 && ( 
-        <div className="container">
-          <p>Instruksi 2:</p>
-          <p>Beritahu saya berapa huruf namanya.</p>
-          <p>
-            <label>Berapa huruf namanya? </label>
-            <input type="number" min="1" max="10" 
-                  onChange={(event) => handleInputNameLength(event, formInputValue,setNumInputs)} />
-          </p>
-          <p>
-            Klik Next untuk instruksi selanjutnya.<br/>
-            
-          </p>
-          <p><button className="btn-next" onClick={secondHandleClick}>Next</button></p>
-        </div>
-      )}
-
-      {showSection3 && (           
-        <div className="container">
-          <p>Instruksi 3:</p>
-          <p>Dari tabel berikut, beritahu saya dikolom mana saja huruf-hurufnya.</p>
-          <div className="feature">
-            <table>
-              <tbody>{renderFormInputs(1, numInputs)}</tbody>
-            </table>
-          </div>
-          <div className="feature">{firstTable()}</div>
-          <p>
-            Klik Next untuk instruksi selanjutnya.
-          </p>
-          <p> <button className="btn-next" onClick={thirdHandleClick}>Next</button></p>
-        </div>
-      )}
-
-      {showSection4 && ( 
-        <div className="container">
-          <p>Instruksi 4:</p>
-          <p>Lakukan seperti di instruksi 3, beritahu saya lagi dikolom mana saja huruf-hurufnya di dalam tabel berikut.</p>
-          <div className="feature">
-            <table>
-              <tbody>{renderFormInputs(2, numInputs)}</tbody>
-            </table>
-          </div>
-          <div className="feature">{secondTable()}</div>
-          <p>
-            Klik Next, untuk melihat hasil tebakan saya.<br/>
-          </p>
-          <p><button className="btn-next" onClick={fourthHandleClick}>Next</button></p>
-        </div>
-      )}
-
-      {showSection5 && (
-        <div className="container">
-          <p>Yeah, I got it right! The name you had in mind is</p>
-          <p>
-            <h1 className="game-result">{result}</h1>
-          </p>
-          <p><button className="btn-next" onClick={lastHandleClick}>Main Lagi?</button></p>
-        </div>
-          
-      )}
+      {nextSection}
     </div>
     
   );
