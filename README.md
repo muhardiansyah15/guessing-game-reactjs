@@ -1,3 +1,21 @@
+
+# Guessing Name Game
+
+The Guessing Name Game is an interactive web application built with ReactJS and ViteJS. It's a fun and challenging game where the user provides a clue, and the system tries to guess the name based on the given clue.
+
+
+# Features
+
+- User Clue Input: Users can enter a clue to help the system guess the name.
+- System Guessing: The system uses an intelligent algorithm to make a guess based on the provided clue.
+- Interactive UI: A visually appealing and user-friendly interface for an engaging gaming experience.
+
+# Technologies Used
+- ReactJS: A popular JavaScript library for building user interfaces.
+- ViteJS: A fast build tool and development server for modern web projects.
+- HTML5 and CSS3: For structuring and styling the game interface.
+
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
