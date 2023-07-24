@@ -2,6 +2,7 @@
 # Guessing Name Game
 
 The Guessing Name Game is an interactive web application built with ReactJS and ViteJS. It's a fun and challenging game where the user provides a clue, and the system tries to guess the name based on the given clue.
+Visit the project website at https://muhardiansyah15.github.io/guessing-game-reactjs/
 
 
 # Features
