@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import buildTable from './BuildTable.jsx'
-import renderFormInputs from './InputForm.jsx'
 import randomList from './Helper.jsx'
 
   
