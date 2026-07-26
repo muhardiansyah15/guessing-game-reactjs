@@ -1,27 +1,39 @@
+# The Mind Reader · Tebak Nama
 
-# Guessing Name Game
+A magician-themed name-guessing game built with React + Vite. Think of a
+nickname (3–10 letters), point at the columns where its letters appear in two
+"magic" letter grids, and the mind reader reveals the exact name — every time.
 
-The Guessing Name Game is an interactive web application built with ReactJS and ViteJS. It's a fun and challenging game where the user provides a clue, and the system tries to guess the name based on the given clue.
-Visit the project website at https://muhardiansyah15.github.io/guessing-game-reactjs/
+Play it at: https://muhardiansyah15.github.io/guessing-game-reactjs/
 
+## How the trick works
 
-# Features
+1. The shuffled alphabet is laid out in **N columns**, where N is the length
+   of the name. For each letter, the player clicks the column it is in.
+2. Each chosen column becomes a **row** of a second shuffled-looking grid.
+   The player points at the columns again.
+3. Letter *i* must sit at (row *i*, chosen column) — the intersection of the
+   two answers identifies every letter uniquely. The app never needs to know
+   the name in advance; the math does the magic.
 
-- User Clue Input: Users can enter a clue to help the system guess the name.
-- System Guessing: The system uses an intelligent algorithm to make a guess based on the provided clue.
-- Interactive UI: A visually appealing and user-friendly interface for an engaging gaming experience.
+The logic lives in [`src/game.js`](src/game.js); the step-by-step UI in
+[`src/App.jsx`](src/App.jsx).
 
-# Technologies Used
-- ReactJS: A popular JavaScript library for building user interfaces.
-- ViteJS: A fast build tool and development server for modern web projects.
-- HTML5 and CSS3: For structuring and styling the game interface.
+## Features
 
+- Click-to-pick columns — no typing, no invalid input possible.
+- Guided wizard with progress steps and per-letter chips (with undo).
+- Dramatic reveal: crystal-ball "thinking" pause, flip-in letters, confetti.
+- Magic night theme with twinkling stars; responsive down to phones;
+  respects `prefers-reduced-motion`.
 
-# React + Vite
+## Development
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+```bash
+npm install
+npm run dev
+npm run build
+npm run lint
+```
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Deployed to GitHub Pages via GitHub Actions on every push to `main`.

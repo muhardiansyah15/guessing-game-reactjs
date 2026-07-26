@@ -1,298 +1,322 @@
-import { useState } from 'react'
-import buildTable from './BuildTable.jsx'
-import randomList from './Helper.jsx'
+import { useEffect, useState } from "react";
+import {
+  MIN_LETTERS,
+  MAX_LETTERS,
+  shuffledAlphabet,
+  buildRows,
+  buildSecondLetters,
+  readName,
+} from "./game";
 
-  
-function randomAlphabet() {
-  let alphabet = Array.from({ length: 26 }, (_, index) => String.fromCharCode(65 + index));
-  return randomList(alphabet);
-}
+const STEP_LABELS = ["Mulai", "Jumlah Huruf", "Ronde 1", "Ronde 2", "Hasil"];
 
-let randomizedAlphabet = randomAlphabet();
-let NumRow = 0;
-let NumColumn = 0;
-let formInputValueFirst = {};
-let formInputValueSecond = {};
-let result = "";
-
-function App() {
-  const [numInputs, setNumInputs] = useState(0);
-  const [showSection0, setShowSection0] = useState(true);
-  const [showSection1, setShowSection1] = useState(false);
-  const [showSection2, setShowSection2] = useState(false);
-  const [showSection3, setShowSection3] = useState(false);
-  const [showSection4, setShowSection4] = useState(false);
-  const [showSection5, setShowSection5] = useState(false);
-
-  
-
- 
-  let nextSection = <div></div>;
-  if (showSection0) {
-    const handleSection0 = () => {
-      setShowSection0(false);
-      setShowSection1(true);
-    };
-    nextSection = <div className="container">
-                      <p>Ayo kita bermain permainan menebak nama! Kamu pikirkan nama seseorang, dan saya akan mencoba menebaknya.<br/>
-                        Bagaimana menurutmu?</p>
-                      <p><button className="btn-start" onClick={handleSection0}>Let's Play</button></p>
-                  </div>
-  } else if (showSection1) {
-    const handleSection1 = () => {
-      setShowSection1(false);
-      setShowSection2(true);
-    };
-    nextSection= <div className="container">
-                    <p><b>Instruksi 1:</b></p>
-                    <p>Ingat satu nama panggilan seseorang dipikiranmu. Kemudian, biarkan Saya akan menebaknya.</p>
-                    <p>Jika sudah, klik Next untuk instruksi selanjutnya.</p>
-                    <p>
-                    <button className="btn-next" onClick={handleSection1}>Next</button>
-                    </p>
-                </div>
-
-
-
-
-  } else if (showSection2) {
-
-    function handleInputNameLength(event, setNumInputs){
-      const inputValue = parseInt(event.target.value);
-      if (inputValue>10) {
-        alert("Maksimal 10 karakter");
-        return
-      } else if (inputValue<3 && inputValue>0){
-        alert("Minimal 3 karakter");
-        return
-      } else if (inputValue<0) {
-        alert("Beritahu Saya berapa jumlah huruf namanya!");
-      } else {
-        setNumInputs(inputValue);
-      }
-    }
-
-    const secondHandleClick = () => {
-      if (numInputs>10) {
-        alert("Maksimal 10 karakter");
-        return
-      } else if (numInputs<3 && numInputs>0){
-        alert("Minimal 3 karakter");
-        return
-      } else if (numInputs<0) {
-        alert("Beritahu Saya berapa jumlah huruf namanya!");
-      } else {
-        for (let i=0; i<numInputs; i++) {
-          formInputValueFirst[i] = 0;
-          formInputValueSecond[i] = 0;
-        }
-      }
-
-      setShowSection2(false);
-      setShowSection3(true);
-    };
-    nextSection = <div className="container">
-                    <p><b>Instruksi 2:</b></p>
-                    <p>Beritahu saya berapa huruf namanya.</p>
-                    <p>
-                      <label>Berapa huruf namanya? </label>
-                      <input type="number" min="1" max="10" 
-                            onChange={(event) => handleInputNameLength(event, setNumInputs)} />
-                    </p>
-                    <p>
-                      Klik Next untuk instruksi selanjutnya.<br/>
-                      
-                    </p>
-                    <p><button className="btn-next" onClick={secondHandleClick}>Next</button></p>
-                  </div>
-
-
-
-
-  } else if (showSection3) {
-    if (numInputs>0){
-      NumColumn =  numInputs;
-      NumRow = (26 % numInputs > 0)? Math.floor(26/numInputs) + 1 : Math.floor(26/numInputs);
-    };
-    const firstTable = () => buildTable(NumRow, NumColumn, randomizedAlphabet);
-
-    const handleFirstFormInputChange = (i, event) => {
-      const inputValue = parseInt(event.target.value);
-      if (inputValue<1 || inputValue>numInputs){
-          alert("Kolom "+inputValue+" tidak ada!");
-      } else {
-          formInputValueFirst[i] = inputValue;
-
-      }
-    };
-    
-    const renderFirstFormInputs = () => {
-        const inputs = [];
-        for (let i = 0; i < numInputs; i++) {
-          inputs.push(
-            <tr key={i}>
-              <td>
-                Huruf ke-{i + 1} berada dikolom?
-              </td>
-              <td>
-                <input type="text" placeholder={`No. Kolom`} 
-                  onChange={(event) => handleFirstFormInputChange(i, event)}/>
-              </td>
-            </tr>
-          );
-        }
-        return inputs;
-    };
-
-    const thirdHandleClick = () => {
-      for (let key in formInputValueFirst){
-        if (formInputValueFirst[key]<1 ||  formInputValueFirst[key] > numInputs ){
-          alert("Inputan Salah!\nKolom "+ formInputValueFirst[key] + " tidak ada.");
-          return
-        } else if (!formInputValueFirst[key]){
-          alert("Inputan Salah!\nBeritahu saya No. Kolom untuk hruf ke-"+ formInputValueFirst[key] + ".");
-          return
-        }
-      }
-      setShowSection3(false);
-      setShowSection4(true);
-    };
-    nextSection = <div className="container">
-                    <p><b>Instruksi 3:</b></p>
-                    <p>Dari tabel berikut, beritahu saya dikolom mana saja huruf-hurufnya.</p>
-                    <p>Note: Pastikan nomor kolom yang di input benar. Jika tidak saya tidak dapat menembaknya.</p>
-                    <div className="feature">
-                      <table>
-                        <tbody>{renderFirstFormInputs()}</tbody>
-                      </table>
-                    </div>
-                    <div className="feature">{firstTable()}</div>
-                    <p>
-                      Klik Next untuk instruksi selanjutnya.
-                    </p>
-                    <p> <button className="btn-next" onClick={thirdHandleClick}>Next</button></p>
-                  </div>
-
-
-
-
-  } else if (showSection4) {
-    let NumColumn2 = NumRow;
-    let NumRow2 = NumColumn;
-
-    const handleSecondFormInputChange = (i, event) => {
-      const inputValue = parseInt(event.target.value);
-      if (inputValue<1 || inputValue>NumColumn2){
-          alert("Kolom "+inputValue+" tidak ada!");
-      } else {
-        formInputValueSecond[i] = inputValue;
-      }
-    };
-    
-    const renderSecondFormInputs = () => {
-        const inputs = [];
-        for (let i = 0; i < numInputs; i++) {
-          inputs.push(
-            <tr key={i}>
-              <td>
-                Huruf ke-{i + 1} berada dikolom?
-              </td>
-              <td>
-                <input type="text" placeholder={`No. Kolom`} 
-                  onChange={(event) => handleSecondFormInputChange(i, event)}/>
-              </td>
-            </tr>
-          );
-        }
-        return inputs;
-    };
-
-    let SecondAlphabet = [];
-    for (let i=0; i < numInputs; i++) {
-      let j = formInputValueFirst[i]-1;
-      for (let k=0; k < NumRow; k++){
-          if (randomizedAlphabet[j]) {
-            SecondAlphabet.push(randomizedAlphabet[j]);
-          } else {
-            SecondAlphabet.push("");
-          };
-          j += numInputs;
-      };
-    };
-
-    
-    for (let i=0; i<SecondAlphabet.length; i++){
-      if (!SecondAlphabet[i]){
-        for (let j=0; j<randomizedAlphabet.length; j++){
-          if (!SecondAlphabet.includes(randomizedAlphabet[j])){
-            SecondAlphabet[i] = randomizedAlphabet[j];
-            continue;
-          }
-        }
-      }
-    }
-
-    const secondTable = () => buildTable(NumRow2, NumColumn2, SecondAlphabet);
-
-    const fourthHandleClick = () => {
-      for (let key in formInputValueSecond){
-        if (formInputValueSecond[key]<1 ||  formInputValueSecond[key] > NumColumn2){
-          alert("Inputan Salah!\nKolom "+ formInputValueSecond[key] + " tidak ada.");
-          return
-        } else if (!formInputValueSecond[key]){
-          alert("Inputan Salah!\nBeritahu saya No. Kolom untuk hruf ke-"+ formInputValueSecond[key] + ".");
-          return
-        }
-      }
-      setShowSection4(false);
-      setShowSection5(true); 
-
-      for (let i=0; i<numInputs; i++){
-        result += SecondAlphabet[(i*NumColumn2)+formInputValueSecond[i]-1];
-      };
-    };
-    
-    nextSection = <div className="container">
-                    <p><b>Instruksi 4:</b></p>
-                    <p>Lakukan seperti di instruksi 3, beritahu saya lagi dikolom mana saja huruf-hurufnya di dalam tabel berikut.</p>
-                    <div className="feature">
-                      <table>
-                        <tbody>{renderSecondFormInputs()}</tbody>
-                      </table>
-                    </div>
-                    <div className="feature">{secondTable()}</div>
-                    <p>
-                      Klik Next, untuk melihat hasil tebakan saya.<br/>
-                    </p>
-                    <p><button className="btn-next" onClick={fourthHandleClick}>Next</button></p>
-                  </div>
-  } else if (showSection5) {
-    
-    const lastHandleClick = () => {
-      setShowSection0(true);
-      setShowSection1(false);
-      setShowSection2(false);
-      setShowSection3(false);
-      setShowSection4(false);
-      setShowSection5(false);
-      formInputValueFirst = {};
-      formInputValueSecond = {};
-      result = '';
-      randomizedAlphabet = randomAlphabet();
-    };
-    nextSection = <div className="container">
-                    <p>Yeah, I got it right! The name you had in mind is</p>
-                    <p className="game-result">{result}</p>
-                    <p><button className="btn-next" onClick={lastHandleClick}>Main Lagi?</button></p>
-                  </div>
-  }
-
+function StepDots({ current }) {
   return (
-    <div>
-      {nextSection}
-    </div>
-    
+    <ol className="step-dots" aria-label="Progres permainan">
+      {STEP_LABELS.map((label, i) => (
+        <li
+          key={label}
+          className={i === current ? "active" : i < current ? "done" : ""}
+          aria-current={i === current ? "step" : undefined}
+        >
+          <span className="dot">{i < current ? "✓" : i + 1}</span>
+          <span className="dot-label">{label}</span>
+        </li>
+      ))}
+    </ol>
   );
 }
 
-export default App
+function Stars() {
+  const symbols = ["✦", "✧", "★", "✶", "✷", "✦", "✧", "✩", "✦", "✧", "★", "✶"];
+  return (
+    <div className="stars" aria-hidden="true">
+      {symbols.map((s, i) => (
+        <span key={i} className={`star star-${i + 1}`}>{s}</span>
+      ))}
+    </div>
+  );
+}
+
+function LetterGrid({ rows, onPick, disabled }) {
+  const [hoverCol, setHoverCol] = useState(null);
+  const cols = rows[0]?.length ?? 0;
+
+  const colClass = (j) =>
+    hoverCol === j && !disabled ? " col-hover" : "";
+
+  return (
+    <div className="grid-wrap" onMouseLeave={() => setHoverCol(null)}>
+      <table className="letter-grid">
+        <thead>
+          <tr>
+            {Array.from({ length: cols }, (_, j) => (
+              <th key={j} className={colClass(j)}>
+                <button
+                  type="button"
+                  disabled={disabled}
+                  aria-label={`Pilih kolom ${j + 1}`}
+                  onClick={() => onPick(j)}
+                  onMouseEnter={() => setHoverCol(j)}
+                  onFocus={() => setHoverCol(j)}
+                >
+                  {j + 1}
+                </button>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, i) => (
+            <tr key={i}>
+              {row.map((letter, j) => (
+                <td
+                  key={j}
+                  className={colClass(j) + (letter ? "" : " blank")}
+                  onClick={() => !disabled && onPick(j)}
+                  onMouseEnter={() => setHoverCol(j)}
+                >
+                  {letter}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function Round({ round, rows, count, selections, onSelect, onUndo, onDone, doneLabel }) {
+  const current = selections.length;
+  const complete = current >= count;
+
+  return (
+    <section className="card">
+      <p className="round-tag">Ronde {round} dari 2</p>
+      <h2>
+        {complete
+          ? "Semua huruf tercatat ✨"
+          : <>Huruf ke-<span className="hl">{current + 1}</span> ada di kolom mana?</>}
+      </h2>
+      <p className="muted">
+        {complete
+          ? round === 1
+            ? "Bagus. Sekarang aku acak ulang hurufnya — jangan kaget."
+            : "Aku sudah merasakan sesuatu… siap dengar jawabannya?"
+          : "Cari hurufnya di tabel, lalu klik nomor kolomnya (atau klik sel mana pun di kolom itu)."}
+      </p>
+
+      <div className="letter-chips" aria-label="Huruf yang sudah tercatat">
+        {Array.from({ length: count }, (_, i) => (
+          <span
+            key={i}
+            className={
+              "chip" +
+              (i < current ? " chip-done" : i === current ? " chip-current" : "")
+            }
+          >
+            {i < current ? `K${selections[i] + 1}` : i + 1}
+          </span>
+        ))}
+      </div>
+
+      <LetterGrid rows={rows} onPick={onSelect} disabled={complete} />
+
+      <div className="actions">
+        {current > 0 && (
+          <button className="btn btn-ghost" onClick={onUndo}>
+            ↩ Ulangi huruf sebelumnya
+          </button>
+        )}
+        {complete && (
+          <button className="btn btn-primary" onClick={onDone}>
+            {doneLabel}
+          </button>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function Reveal({ name, onReplay }) {
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShown(true), 2200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <section className="card reveal">
+      {!shown && (
+        <>
+          <div className="ball thinking" aria-hidden="true">🔮</div>
+          <h2 className="pulse-text">Membaca pikiranmu…</h2>
+          <p className="muted">Konsentrasi… jangan pikirkan nama lain!</p>
+        </>
+      )}
+      {shown && (
+        <>
+          <div className="confetti" aria-hidden="true">
+            {Array.from({ length: 18 }, (_, i) => (
+              <i key={i} className={`c c-${i + 1}`} />
+            ))}
+          </div>
+          <div className="ball" aria-hidden="true">🔮</div>
+          <h2>Aku tahu! Nama yang kamu pikirkan adalah…</h2>
+          <p className="result" aria-label={`Nama tebakan: ${name}`}>
+            {name.split("").map((letter, i) => (
+              <span key={i} className="result-letter" style={{ animationDelay: `${i * 0.18}s` }}>
+                {letter}
+              </span>
+            ))}
+          </p>
+          <p className="muted">Benar, kan? Sulap tidak pernah bohong. 😉</p>
+          <div className="actions center">
+            <button className="btn btn-primary" onClick={onReplay}>
+              🎩 Main Lagi
+            </button>
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+export default function App() {
+  const [step, setStep] = useState(0); // matches STEP_LABELS index
+  const [shuffled, setShuffled] = useState(shuffledAlphabet);
+  const [nameLength, setNameLength] = useState(null);
+  const [sel1, setSel1] = useState([]);
+  const [sel2, setSel2] = useState([]);
+
+  const cols1 = nameLength ?? 1;
+  const rows1 = buildRows(shuffled, cols1);
+  const cols2 = rows1.length;
+  const second =
+    nameLength && sel1.length === nameLength
+      ? buildSecondLetters(shuffled, sel1, cols1)
+      : [];
+  const rows2 = second.length ? buildRows(second, cols2) : [];
+
+  const replay = () => {
+    setShuffled(shuffledAlphabet());
+    setNameLength(null);
+    setSel1([]);
+    setSel2([]);
+    setStep(0);
+  };
+
+  return (
+    <div className="stage">
+      <Stars />
+      <header className="hero">
+        <span className="hero-hat" aria-hidden="true">🎩</span>
+        <h1>The Mind Reader</h1>
+        <p className="tagline">Permainan tebak nama — aku baca pikiranmu lewat dua tabel ajaib</p>
+      </header>
+
+      <StepDots current={step} />
+
+      <main className="board">
+        {step === 0 && (
+          <section className="card intro">
+            <div className="ball float" aria-hidden="true">🔮</div>
+            <h2>Berani uji kekuatan sihirku?</h2>
+            <p>
+              Pikirkan <b>satu nama panggilan</b> — namamu, temanmu, siapa pun
+              ({MIN_LETTERS}–{MAX_LETTERS} huruf). Simpan di kepalamu,
+              jangan beri tahu siapa-siapa. Aku yang akan menebaknya.
+            </p>
+            <div className="actions center">
+              <button className="btn btn-primary btn-big" onClick={() => setStep(1)}>
+                ✨ Sudah, aku punya nama
+              </button>
+            </div>
+          </section>
+        )}
+
+        {step === 1 && (
+          <section className="card">
+            <h2>Berapa huruf nama itu?</h2>
+            <p className="muted">
+              Hitung dalam hati, lalu pilih. Contoh: BUDI = 4 huruf.
+            </p>
+            <div className="length-picker">
+              {Array.from(
+                { length: MAX_LETTERS - MIN_LETTERS + 1 },
+                (_, i) => MIN_LETTERS + i
+              ).map((n) => (
+                <button
+                  key={n}
+                  className={"num" + (nameLength === n ? " selected" : "")}
+                  onClick={() => setNameLength(n)}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+            <div className="actions center">
+              <button
+                className="btn btn-primary"
+                disabled={!nameLength}
+                onClick={() => setStep(2)}
+              >
+                Lanjut ke Ronde 1 →
+              </button>
+            </div>
+          </section>
+        )}
+
+        {step === 2 && (
+          <Round
+            round={1}
+            rows={rows1}
+            count={nameLength}
+            selections={sel1}
+            onSelect={(col) =>
+              sel1.length < nameLength && setSel1([...sel1, col])
+            }
+            onUndo={() => setSel1(sel1.slice(0, -1))}
+            onDone={() => setStep(3)}
+            doneLabel="Acak ulang hurufnya 🌀"
+          />
+        )}
+
+        {step === 3 && (
+          <Round
+            round={2}
+            rows={rows2}
+            count={nameLength}
+            selections={sel2}
+            onSelect={(col) =>
+              sel2.length < nameLength && setSel2([...sel2, col])
+            }
+            onUndo={() => setSel2(sel2.slice(0, -1))}
+            onDone={() => setStep(4)}
+            doneLabel="🔮 Baca pikiranku!"
+          />
+        )}
+
+        {step === 4 && (
+          <Reveal name={readName(second, sel2, cols2)} onReplay={replay} />
+        )}
+      </main>
+
+      <footer className="footer">
+        <p>
+          Dibuat dengan <span aria-hidden="true">🪄</span> oleh{" "}
+          <a href="https://muhardiansyah.netlify.app/" target="_blank" rel="noopener noreferrer">
+            Muhardiansyah
+          </a>
+        </p>
+        <ul className="footer-social">
+          <li><a href="https://github.com/muhardiansyah15" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/muhardiansyah15/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+          <li><a href="https://www.instagram.com/muhardiansyah15" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+        </ul>
+      </footer>
+    </div>
+  );
+}
