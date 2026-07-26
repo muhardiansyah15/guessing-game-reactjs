@@ -307,14 +307,14 @@ export default function App() {
       <footer className="footer">
         <p>
           Dibuat dengan <span aria-hidden="true">🪄</span> oleh{" "}
-          <a href="https://muhardiansyah.netlify.app/" target="_blank" rel="noopener noreferrer">
+          <a href="https://muhardiansyah15.github.io/" target="_blank" rel="noopener noreferrer">
             Muhardiansyah
           </a>
         </p>
         <ul className="footer-social">
           <li><a href="https://github.com/muhardiansyah15" target="_blank" rel="noopener noreferrer">GitHub</a></li>
           <li><a href="https://www.linkedin.com/in/muhardiansyah15/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-          <li><a href="https://www.instagram.com/muhardiansyah15" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+          <li><a href="https://www.instagram.com/muhardiansyah1597" target="_blank" rel="noopener noreferrer">Instagram</a></li>
         </ul>
       </footer>
     </div>
